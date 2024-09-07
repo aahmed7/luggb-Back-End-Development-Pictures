@@ -35,7 +35,10 @@ def count():
 ######################################################################
 @app.route("/picture", methods=["GET"])
 def get_pictures():
-    pass
+    if data:
+        return jsonify(data), 200
+
+    return {"message": "Internal server error"}, 500
 
 ######################################################################
 # GET A PICTURE
@@ -44,7 +47,12 @@ def get_pictures():
 
 @app.route("/picture/<int:id>", methods=["GET"])
 def get_picture_by_id(id):
-    pass
+    if data:
+        for picture in data:
+            if picture["id"] == id:
+                return jsonify(picture), 200
+
+    return {"message": "picture not found"}, 404
 
 
 ######################################################################
@@ -52,7 +60,15 @@ def get_picture_by_id(id):
 ######################################################################
 @app.route("/picture", methods=["POST"])
 def create_picture():
-    pass
+    picture = request.json
+    if picture:
+        for x in data:
+            if x["id"] == picture["id"]:
+                return jsonify({"Message": f"picture with id {picture['id']} already present"}), 302
+        data.append(picture)
+        return {"id":picture["id"]}, 201
+
+    return {"message": "picture not found"}, 404
 
 ######################################################################
 # UPDATE A PICTURE
@@ -61,11 +77,24 @@ def create_picture():
 
 @app.route("/picture/<int:id>", methods=["PUT"])
 def update_picture(id):
-    pass
+    picture = request.json
+    if picture:
+        for x in data:
+            if x["id"] == id:
+                x.update(picture)
+                return jsonify(picture), 200
+
+    return {"message": "picture not found"}, 404
 
 ######################################################################
 # DELETE A PICTURE
 ######################################################################
 @app.route("/picture/<int:id>", methods=["DELETE"])
 def delete_picture(id):
-    pass
+    if data:
+        for picture in data:
+            if picture["id"] == id:
+                data.remove(picture)
+                return {"message": "picture deleted successfully"}, 204
+
+    return {"message": "picture not found"}, 404
